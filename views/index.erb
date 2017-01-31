@@ -5,7 +5,31 @@
   </head>
 
   <body>
-    <p>hangman!</p>
+    <h1>Hangman!</h1>
+    <h2>Current word:</h2>
+    <p><%=game.show_word%></p>
+    <p><%=game.guesses%> guesses remaining.</p>
+    <p>These letters have already been guessed:</p>
+    <p><%=game.guessed.reduce('') {|sum, word| sum += word + ', '}[0..-3]%></p>
+    <%if !(guessed_right || out_of_guesses)%>
+      <p>Enter your guess here:</p>
+      <form>
+        <input type='text' name='guess' />
+        <input type='submit' value = 'Guess' />
+      </form>
+    <%elsif guessed_right%>
+      <p>You guessed it! The word is <%=game.word%>.</p>
+      <form>
+        <input type='hidden' name='new_game' value='true'/>
+        <input type='submit' value='New Game'/>
+      </form>
+    <%elsif out_of_guesses%>
+      <p>You ran out of guesses. The word was <%=game.word%>.</p>
+      <form>
+        <input type='hidden' name='new_game' value='true'/>
+        <input type='submit' value='New Game'/>
+      </form>
+    <%end%>
   </body>
 
 </html>

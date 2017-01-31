@@ -1,0 +1,6 @@
+---
+- !ruby/object:Game
+  guesses: 10
+  word: midstream
+  guessed:
+  - a

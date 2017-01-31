@@ -1,38 +1,36 @@
 require 'yaml'
 
 def get_random_word
-  word_pool = File.readlines('hangman_words.txt')
+  word_pool = File.readlines('lib/hangman_words.txt')
   word_pool[rand(0..word_pool.length)].chomp
 end
 
 class Game
+  attr_accessor :word, :guesses, :guessed
   def initialize
     @guesses = 10
     @word = get_random_word
     @guessed = Array.new
 
-    mainloop
+    #mainloop
   end
 
   #gets a legitimate guess from the user
-  def get_guess
-    loop do
-      puts "Enter your guess: "
-      letter = gets.chomp.downcase
-      if letter == 'save'
-        save_game
-      elsif letter == 'load'
-        load_game
-        return false#signal this game is dead
-      elsif letter.length != 1 || !(letter =~ /[a-z]/)
-        puts "Please enter a single letter."
-      elsif @guessed.include? letter
-        puts "Please a letter you have not already guessed."
-      else#valid input
-        @guessed.push letter
-        @guesses -= 1 unless @word.include? letter
-        return letter
-      end
+  def process_guess letter
+      #puts "Enter your guess: "
+      #if letter == 'save'
+      #  save_game
+      #elsif letter == 'load'
+      #  load_game
+      #  return false#signal this game is dead
+      #elsif letter.length != 1 || !(letter =~ /[a-z]/)
+      #  return "Please enter a single letter."
+      #elsif @guessed.include? letter
+      #  return "Please a letter you have not already guessed."
+      #assume valid input
+    if letter.length == 1 && letter =~ /[a-z]/
+      @guessed.push letter unless @guessed.include? letter
+      @guesses -= 1 unless @word.include? letter
     end
   end
 
@@ -55,26 +53,27 @@ class Game
   end
 
   def save_game
-    unless File.exist?('saves.yaml')
+    unless File.exist?('lib/saves.yaml')
       #create file with empty array in yaml
-      File.open('saves.yaml', 'w') do |saves_file|
+      File.open('lib/saves.yaml', 'w') do |saves_file|
         saves_file.puts YAML::dump(Array.new)
       end
     end
 
     saves_array = Array.new
 
-    File.open('saves.yaml', 'r') do |saves_file|
+    File.open('lib/saves.yaml', 'r') do |saves_file|
       saves_array = YAML::load(saves_file)
     end
 
     saves_array.push(self)
 
-    File.open('saves.yaml', 'w') do |saves_file|
+    File.open('lib/saves.yaml', 'w') do |saves_file|
       saves_file.puts YAML::dump(saves_array)
     end
 
-    puts("Game saved.")
+    #puts("Game saved.")
+    return true
   end
 
   def prepare_for_display
@@ -84,7 +83,7 @@ class Game
   end
 
   def load_game
-    saves_file = File.read('saves.yaml')
+    saves_file = File.read('lib/saves.yaml')
     saves_array = YAML::load(saves_file)
     saves_array.each_with_index do |save, i|
       puts "#{i+1}: #{save.prepare_for_display}"
